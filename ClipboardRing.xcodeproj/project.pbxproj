@@ -3,13 +3,15 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		4060AF3222574F9D00516117 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4060AF3122574F9D00516117 /* AppDelegate.swift */; };
 		4060AF3422574F9E00516117 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4060AF3322574F9E00516117 /* Assets.xcassets */; };
 		4060AF3722574F9E00516117 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4060AF3522574F9E00516117 /* MainMenu.xib */; };
+		4060AF402257597500516117 /* StatusMenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4060AF3F2257597500516117 /* StatusMenuController.swift */; };
+		4097C4AF22577A4A00A31D8F /* PasteboardWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4097C4AE22577A4A00A31D8F /* PasteboardWatcher.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +21,8 @@
 		4060AF3622574F9E00516117 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		4060AF3822574F9E00516117 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4060AF3922574F9E00516117 /* ClipboardRing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ClipboardRing.entitlements; sourceTree = "<group>"; };
+		4060AF3F2257597500516117 /* StatusMenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMenuController.swift; sourceTree = "<group>"; };
+		4097C4AE22577A4A00A31D8F /* PasteboardWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteboardWatcher.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +60,8 @@
 				4060AF3522574F9E00516117 /* MainMenu.xib */,
 				4060AF3822574F9E00516117 /* Info.plist */,
 				4060AF3922574F9E00516117 /* ClipboardRing.entitlements */,
+				4060AF3F2257597500516117 /* StatusMenuController.swift */,
+				4097C4AE22577A4A00A31D8F /* PasteboardWatcher.swift */,
 			);
 			path = ClipboardRing;
 			sourceTree = "<group>";
@@ -96,7 +102,7 @@
 				};
 			};
 			buildConfigurationList = 4060AF2922574F9D00516117 /* Build configuration list for PBXProject "ClipboardRing" */;
-			compatibilityVersion = "Xcode 9.3";
+			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -130,7 +136,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4060AF402257597500516117 /* StatusMenuController.swift in Sources */,
 				4060AF3222574F9D00516117 /* AppDelegate.swift in Sources */,
+				4097C4AF22577A4A00A31D8F /* PasteboardWatcher.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,8 +276,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ClipboardRing/ClipboardRing.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = BYHGYKQST9;
 				INFOPLIST_FILE = ClipboardRing/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -277,6 +287,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = me.eltonlika.ClipboardRing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -286,8 +297,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ClipboardRing/ClipboardRing.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = BYHGYKQST9;
 				INFOPLIST_FILE = ClipboardRing/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -295,6 +308,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = me.eltonlika.ClipboardRing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
