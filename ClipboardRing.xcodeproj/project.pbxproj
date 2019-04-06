@@ -11,6 +11,12 @@
 		4060AF3422574F9E00516117 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4060AF3322574F9E00516117 /* Assets.xcassets */; };
 		4060AF3722574F9E00516117 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4060AF3522574F9E00516117 /* MainMenu.xib */; };
 		4060AF402257597500516117 /* StatusMenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4060AF3F2257597500516117 /* StatusMenuController.swift */; };
+		40628C772259644800630430 /* PALoginItemUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 40628C752259644800630430 /* PALoginItemUtility.m */; };
+		40628C7A2259650000630430 /* PALoginItemUtility.h in Sources */ = {isa = PBXBuildFile; fileRef = 40628C762259644800630430 /* PALoginItemUtility.h */; };
+		40628C7B2259650000630430 /* DDHotKeyCenter.h in Sources */ = {isa = PBXBuildFile; fileRef = 40F4F20E2258DFB900794570 /* DDHotKeyCenter.h */; };
+		40628C7C2259650000630430 /* DDHotKeyTextField.h in Sources */ = {isa = PBXBuildFile; fileRef = 40F4F20D2258DFB900794570 /* DDHotKeyTextField.h */; };
+		40628C7D2259650000630430 /* DDHotKeyUtilities.h in Sources */ = {isa = PBXBuildFile; fileRef = 40F4F20F2258DFB900794570 /* DDHotKeyUtilities.h */; };
+		40628C7E2259650000630430 /* ClipboardRing-Bridging-Header.h in Sources */ = {isa = PBXBuildFile; fileRef = 40628C792259648A00630430 /* ClipboardRing-Bridging-Header.h */; };
 		4097C4AF22577A4A00A31D8F /* PasteboardWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4097C4AE22577A4A00A31D8F /* PasteboardWatcher.swift */; };
 		40AB1FB42257D8CC00FE4298 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40AB1FB32257D8CC00FE4298 /* Carbon.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		40F4F2112258DFB900794570 /* DDHotKeyUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 40F4F20B2258DFB900794570 /* DDHotKeyUtilities.m */; };
@@ -26,9 +32,12 @@
 		4060AF3822574F9E00516117 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4060AF3922574F9E00516117 /* ClipboardRing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ClipboardRing.entitlements; sourceTree = "<group>"; };
 		4060AF3F2257597500516117 /* StatusMenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMenuController.swift; sourceTree = "<group>"; };
+		40628C6F225960DC00630430 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+		40628C752259644800630430 /* PALoginItemUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PALoginItemUtility.m; sourceTree = "<group>"; };
+		40628C762259644800630430 /* PALoginItemUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PALoginItemUtility.h; sourceTree = "<group>"; };
+		40628C792259648A00630430 /* ClipboardRing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ClipboardRing-Bridging-Header.h"; sourceTree = "<group>"; };
 		4097C4AE22577A4A00A31D8F /* PasteboardWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteboardWatcher.swift; sourceTree = "<group>"; };
 		40AB1FB32257D8CC00FE4298 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
-		40F4F20A2258DFB800794570 /* ClipboardRing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ClipboardRing-Bridging-Header.h"; sourceTree = "<group>"; };
 		40F4F20B2258DFB900794570 /* DDHotKeyUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDHotKeyUtilities.m; sourceTree = "<group>"; };
 		40F4F20C2258DFB900794570 /* DDHotKeyTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDHotKeyTextField.m; sourceTree = "<group>"; };
 		40F4F20D2258DFB900794570 /* DDHotKeyTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDHotKeyTextField.h; sourceTree = "<group>"; };
@@ -69,6 +78,7 @@
 		4060AF3022574F9D00516117 /* ClipboardRing */ = {
 			isa = PBXGroup;
 			children = (
+				40628C712259642300630430 /* LoginItemUtility */,
 				40F4F2092258DF8600794570 /* DDHotKey */,
 				4060AF3122574F9D00516117 /* AppDelegate.swift */,
 				4060AF3322574F9E00516117 /* Assets.xcassets */,
@@ -77,13 +87,24 @@
 				4060AF3922574F9E00516117 /* ClipboardRing.entitlements */,
 				4060AF3F2257597500516117 /* StatusMenuController.swift */,
 				4097C4AE22577A4A00A31D8F /* PasteboardWatcher.swift */,
+				40628C792259648A00630430 /* ClipboardRing-Bridging-Header.h */,
 			);
 			path = ClipboardRing;
+			sourceTree = "<group>";
+		};
+		40628C712259642300630430 /* LoginItemUtility */ = {
+			isa = PBXGroup;
+			children = (
+				40628C762259644800630430 /* PALoginItemUtility.h */,
+				40628C752259644800630430 /* PALoginItemUtility.m */,
+			);
+			path = LoginItemUtility;
 			sourceTree = "<group>";
 		};
 		40AB1FB22257D8CC00FE4298 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				40628C6F225960DC00630430 /* ServiceManagement.framework */,
 				40AB1FB32257D8CC00FE4298 /* Carbon.framework */,
 			);
 			name = Frameworks;
@@ -98,7 +119,6 @@
 				40F4F20C2258DFB900794570 /* DDHotKeyTextField.m */,
 				40F4F20F2258DFB900794570 /* DDHotKeyUtilities.h */,
 				40F4F20B2258DFB900794570 /* DDHotKeyUtilities.m */,
-				40F4F20A2258DFB800794570 /* ClipboardRing-Bridging-Header.h */,
 			);
 			path = DDHotKey;
 			sourceTree = "<group>";
@@ -182,12 +202,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4060AF402257597500516117 /* StatusMenuController.swift in Sources */,
-				40F4F2122258DFB900794570 /* DDHotKeyTextField.m in Sources */,
-				4060AF3222574F9D00516117 /* AppDelegate.swift in Sources */,
+				40628C7A2259650000630430 /* PALoginItemUtility.h in Sources */,
+				40628C772259644800630430 /* PALoginItemUtility.m in Sources */,
+				40628C7D2259650000630430 /* DDHotKeyUtilities.h in Sources */,
+				40628C7B2259650000630430 /* DDHotKeyCenter.h in Sources */,
+				40628C7C2259650000630430 /* DDHotKeyTextField.h in Sources */,
 				40F4F2112258DFB900794570 /* DDHotKeyUtilities.m in Sources */,
 				40F4F2132258DFB900794570 /* DDHotKeyCenter.m in Sources */,
+				40F4F2122258DFB900794570 /* DDHotKeyTextField.m in Sources */,
+				40628C7E2259650000630430 /* ClipboardRing-Bridging-Header.h in Sources */,
+				4060AF3222574F9D00516117 /* AppDelegate.swift in Sources */,
 				4097C4AF22577A4A00A31D8F /* PasteboardWatcher.swift in Sources */,
+				4060AF402257597500516117 /* StatusMenuController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -338,7 +364,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = me.eltonlika.ClipboardRing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "ClipboardRing/DDHotKey/ClipboardRing-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "ClipboardRing/ClipboardRing-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -362,7 +388,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = me.eltonlika.ClipboardRing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "ClipboardRing/DDHotKey/ClipboardRing-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "ClipboardRing/ClipboardRing-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

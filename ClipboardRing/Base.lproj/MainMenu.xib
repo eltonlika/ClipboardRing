@@ -16,7 +16,7 @@
         <customObject id="BWd-bQ-Sva" customClass="StatusMenuController" customModule="ClipboardRing" customModuleProvider="target">
             <connections>
                 <outlet property="clearMenuItem" destination="ynd-pz-WSB" id="BtR-t3-186"/>
-                <outlet property="clearSeparatorItem" destination="ZoU-bN-RqN" id="9xG-Vi-5BE"/>
+                <outlet property="startAtLoginMenuItem" destination="j1A-3b-n4E" id="tv8-ex-kKy"/>
                 <outlet property="statusMenu" destination="Mab-9a-h2r" id="1FQ-M6-2Hw"/>
             </connections>
         </customObject>
@@ -29,7 +29,9 @@
                         <action selector="clearClicked:" target="BWd-bQ-Sva" id="xby-DE-jn3"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="b74-NS-nLo"/>
+                <menuItem title="Start at login" id="j1A-3b-n4E">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
                 <menuItem title="Quit" keyEquivalent="q" id="wJe-Nb-i6u">
                     <connections>
                         <action selector="quitClicked:" target="BWd-bQ-Sva" id="fUs-4O-3gq"/>

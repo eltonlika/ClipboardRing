@@ -12,7 +12,7 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     
     @IBOutlet weak var statusMenu: NSMenu!
     @IBOutlet weak var clearMenuItem: NSMenuItem!
-    @IBOutlet weak var clearSeparatorItem: NSMenuItem!
+    @IBOutlet weak var startAtLoginMenuItem: NSMenuItem!
     
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     
@@ -34,9 +34,13 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         // set menu delegate
         statusMenu.delegate = self
         
-        // initially there are no clipboard items, so hide dhe Clear button and it's separator
+        // initially there are no clipboard items, so hide the Clear button
         clearMenuItem.isHidden = true
-        clearSeparatorItem.isHidden = true
+        
+        // set state and handler of "Start at login" menu item
+        startAtLoginMenuItem.action = #selector(toggleStartAtLogin);
+        startAtLoginMenuItem.target = self
+        startAtLoginMenuItem.state = PALoginItemUtility.isCurrentApplicatonInLoginItems() ? .on : .off;
         
         // set default hotkey handler
         globalHotKey = DDHotKey(
@@ -63,6 +67,16 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         DDHotKeyCenter.shared()?.register(globalHotKey)
     }
     
+    @objc func toggleStartAtLogin() {
+        if PALoginItemUtility.isCurrentApplicatonInLoginItems() {
+            PALoginItemUtility.removeCurrentApplicatonToLoginItems()
+            startAtLoginMenuItem.state = .off;
+        }else{
+            PALoginItemUtility.addCurrentApplicatonToLoginItems()
+            startAtLoginMenuItem.state = .on;
+        }
+    }
+    
     @objc func menuItemClicked(sender: NSMenuItem) {
         if let value = sender.representedObject as? String {
             // skip the next pasteboard change detection so the selected value will not be readded to the ring
@@ -83,7 +97,6 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     @IBAction func clearClicked(_ sender: NSMenuItem) {
         statusMenu.items.removeFirst(statusMenu.items.count - 4)
         clearMenuItem.isHidden = true
-        clearSeparatorItem.isHidden = true
     }
     
     private func addNewClipMenuItem(newValue: String) {
@@ -125,9 +138,8 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         // insert new menu item at the top of the items
         statusMenu.insertItem(menuItem, at: 0)
         
-        // unhide clear menu item and separator
+        // unhide clear menu item
         clearMenuItem.isHidden = false
-        clearSeparatorItem.isHidden = false
     }
     
     func newlyCopiedStringObtained(copiedString: String) {
