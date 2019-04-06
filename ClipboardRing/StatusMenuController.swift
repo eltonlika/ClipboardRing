@@ -27,6 +27,7 @@ class StatusMenuController: NSObject, PasteboardWatcherDelegate {
         icon?.isTemplate = true // best for dark mode
         statusItem.button?.image = icon
         statusItem.menu = statusMenu
+        statusItem.isVisible = true
         
         // initially there are no clipboard items, so hide dhe Clear button and it's separator
         clearMenuItem.isHidden = true
@@ -38,10 +39,21 @@ class StatusMenuController: NSObject, PasteboardWatcherDelegate {
         
         // register hotkey detection
         DDHotKeyCenter.shared()?.registerHotKey(
-            withKeyCode: UInt16(0x09),
+            withKeyCode: UInt16(0x2A), // 0x09
             modifierFlags: NSEvent.ModifierFlags.command.rawValue | NSEvent.ModifierFlags.shift.rawValue,
-            task: { (ev) in print(ev)}
-        );
+            task: { (event : NSEvent?) in
+                if let e = event {
+                    self.globalHotKeyHandler(event: e)
+                }
+        });
+    }
+    
+    @objc func globalHotKeyHandler(event : NSEvent){
+        statusItem.button?.performClick(nil)
+        //        if let statusBtn = statusItem.button {
+        //            popover.show(relativeTo: statusBtn.bounds, of: statusBtn, preferredEdge: NSRectEdge.minY)
+        //        }
+        print(event)
     }
     
     @IBAction func quitClicked(_ sender: NSMenuItem) {
@@ -75,7 +87,7 @@ class StatusMenuController: NSObject, PasteboardWatcherDelegate {
         
         // create menu item with shortcut Command + 0
         let menuItem = NSMenuItem(title: label, action: #selector(menuItemClicked(sender:)), keyEquivalent: "0")
-        menuItem.keyEquivalentModifierMask = NSEvent.ModifierFlags.command
+        menuItem.keyEquivalentModifierMask = []
         menuItem.representedObject = newValue
         menuItem.target = self
         menuItem.isEnabled = true
