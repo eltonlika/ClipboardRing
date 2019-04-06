@@ -38,9 +38,9 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         clearMenuItem.isHidden = true
         
         // set state and handler of "Start at login" menu item
-        startAtLoginMenuItem.action = #selector(toggleStartAtLogin);
+        startAtLoginMenuItem.action = #selector(toggleStartAtLogin)
         startAtLoginMenuItem.target = self
-        startAtLoginMenuItem.state = PALoginItemUtility.isCurrentApplicatonInLoginItems() ? .on : .off;
+        startAtLoginMenuItem.state = PALoginItemUtility.isCurrentApplicatonInLoginItems() ? .on : .off
         
         // set default hotkey handler
         globalHotKey = DDHotKey(
@@ -70,10 +70,10 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     @objc func toggleStartAtLogin() {
         if PALoginItemUtility.isCurrentApplicatonInLoginItems() {
             PALoginItemUtility.removeCurrentApplicatonToLoginItems()
-            startAtLoginMenuItem.state = .off;
+            startAtLoginMenuItem.state = .off
         }else{
             PALoginItemUtility.addCurrentApplicatonToLoginItems()
-            startAtLoginMenuItem.state = .on;
+            startAtLoginMenuItem.state = .on
         }
     }
     
@@ -100,8 +100,8 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     }
     
     private func addNewClipMenuItem(newValue: String) {
-        let items = statusMenu.items;
-        let clipCount = items.count - 4;
+        let items = statusMenu.items
+        let clipCount = items.count - 4
         
         if clipCount > 0 {
             // if the new value is equal to the first item then do not add a new menu item
@@ -125,7 +125,7 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         
         // create truncated label of the new value
         let trimmedValue = newValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        let label = trimmedValue.count > 40 ? String(trimmedValue.prefix(40)) + "..." : trimmedValue;
+        let label = trimmedValue.count > 40 ? String(trimmedValue.prefix(40)) + "..." : trimmedValue
         
         // create a new menu item with shortcut "0"
         let menuItem = NSMenuItem(title: label, action: #selector(menuItemClicked(sender:)), keyEquivalent: "0")
@@ -133,7 +133,7 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         menuItem.representedObject = newValue
         menuItem.target = self
         menuItem.isEnabled = true
-        menuItem.toolTip = newValue;
+        menuItem.toolTip = newValue
         
         // insert new menu item at the top of the items
         statusMenu.insertItem(menuItem, at: 0)
