@@ -95,6 +95,7 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     }
     
     @IBAction func clearClicked(_ sender: NSMenuItem) {
+        NSPasteboard.general.clearContents()
         statusMenu.items.removeFirst(statusMenu.items.count - 4)
         clearMenuItem.isHidden = true
     }
