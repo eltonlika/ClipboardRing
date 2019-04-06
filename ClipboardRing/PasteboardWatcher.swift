@@ -23,9 +23,6 @@ class PasteboardWatcher : NSObject {
     
     private var timer : Timer?
     
-    /// skip the next pasteboard change detection, so the delegate will not trigger
-    public var skipNextChange = false
-    
     public var delegate : PasteboardWatcherDelegate?
     
     override init(){
@@ -41,11 +38,6 @@ class PasteboardWatcher : NSObject {
         }
     }
     
-    public func stopPolling() {
-        timer?.invalidate()
-        timer = nil
-    }
-    
     private func timerFired(t : Timer){
         let newChangeCount = pasteboard.changeCount
         
@@ -54,11 +46,6 @@ class PasteboardWatcher : NSObject {
         }
         
         lastChangeCount = newChangeCount;
-        
-        if skipNextChange {
-            skipNextChange = false;
-            return;
-        }
         
         if let copiedStr = pasteboard.string(forType: NSPasteboard.PasteboardType.string) {
             delegate?.newlyCopiedStringObtained(copiedString: copiedStr)

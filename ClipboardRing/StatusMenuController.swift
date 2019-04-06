@@ -18,6 +18,9 @@ class StatusMenuController: NSObject, PasteboardWatcherDelegate {
     
     private let pasteboardWatcher = PasteboardWatcher()
     
+    // flag that when set to true skips the next pasteboard copy detection
+    private var skipNextCopiedString = false
+    
     override func awakeFromNib() {
         // set menu appearance
         let icon = NSImage(named: "statusIcon")
@@ -25,12 +28,20 @@ class StatusMenuController: NSObject, PasteboardWatcherDelegate {
         statusItem.button?.image = icon
         statusItem.menu = statusMenu
         
+        // initially there are no clipboard items, so hide dhe Clear button and it's separator
         clearMenuItem.isHidden = true
         clearSeparatorItem.isHidden = true
         
         // start listening for pasteboard changes
         pasteboardWatcher.delegate = self
         pasteboardWatcher.startPolling()
+        
+        // register hotkey detection
+        DDHotKeyCenter.shared()?.registerHotKey(
+            withKeyCode: UInt16(0x09),
+            modifierFlags: NSEvent.ModifierFlags.command.rawValue | NSEvent.ModifierFlags.shift.rawValue,
+            task: { (ev) in print(ev)}
+        );
     }
     
     @IBAction func quitClicked(_ sender: NSMenuItem) {
@@ -68,6 +79,7 @@ class StatusMenuController: NSObject, PasteboardWatcherDelegate {
         menuItem.representedObject = newValue
         menuItem.target = self
         menuItem.isEnabled = true
+        menuItem.toolTip = newValue;
         
         // update shortcut numbers for the 9 existing top menu items
         if clipCount > 0 {
@@ -92,7 +104,7 @@ class StatusMenuController: NSObject, PasteboardWatcherDelegate {
     @objc func menuItemClicked(sender: NSMenuItem) {
         if let value = sender.representedObject as? String {
             // skip the next pasteboard change detection so the selected value will not be readded to the ring
-            pasteboardWatcher.skipNextChange = true
+            skipNextCopiedString = true
             
             // set current pasteboard string value
             let pasteboard = NSPasteboard.general
@@ -102,6 +114,11 @@ class StatusMenuController: NSObject, PasteboardWatcherDelegate {
     }
     
     func newlyCopiedStringObtained(copiedString: String) {
+        if skipNextCopiedString {
+            skipNextCopiedString = false
+            return
+        }
+        
         if !copiedString.isEmpty {
             addNewClipMenuItem(newValue: copiedString)
         }
