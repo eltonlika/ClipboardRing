@@ -19,18 +19,11 @@ class PasteboardWatcher : NSObject {
     
     private let pasteboard = NSPasteboard.general
     
-    private var lastChangeCount : Int
+    private var lastChangeCount = 0
     
     private var timer : Timer?
     
     public var delegate : PasteboardWatcherDelegate?
-    
-    override init(){
-        // assigning current pasteboard changeCount so that it can be compared later to identify changes
-        lastChangeCount = pasteboard.changeCount
-        
-        super.init()
-    }
     
     public func startPolling() {
         if timer == nil {
@@ -39,6 +32,7 @@ class PasteboardWatcher : NSObject {
     }
     
     private func timerFired(t : Timer){
+        // assigning current pasteboard changeCount so that it can be compared later to identify changes
         let newChangeCount = pasteboard.changeCount
         
         if newChangeCount == lastChangeCount {

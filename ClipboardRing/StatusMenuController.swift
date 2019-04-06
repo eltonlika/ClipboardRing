@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class StatusMenuController: NSObject, PasteboardWatcherDelegate {
+class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate {
     
     @IBOutlet weak var statusMenu: NSMenu!
     @IBOutlet weak var clearMenuItem: NSMenuItem!
@@ -18,45 +18,65 @@ class StatusMenuController: NSObject, PasteboardWatcherDelegate {
     
     private let pasteboardWatcher = PasteboardWatcher()
     
+    private var globalHotKey : DDHotKey?
+    
     // flag that when set to true skips the next pasteboard copy detection
     private var skipNextCopiedString = false
     
     override func awakeFromNib() {
-        // set menu appearance
+        // set status item appearance
         let icon = NSImage(named: "statusIcon")
         icon?.isTemplate = true // best for dark mode
         statusItem.button?.image = icon
         statusItem.menu = statusMenu
         statusItem.isVisible = true
         
+        // set menu delegate
+        statusMenu.delegate = self
+        
         // initially there are no clipboard items, so hide dhe Clear button and it's separator
         clearMenuItem.isHidden = true
         clearSeparatorItem.isHidden = true
         
+        // set default hotkey handler
+        globalHotKey = DDHotKey(
+            keyCode: UInt16(0x2A),
+            modifierFlags: NSEvent.ModifierFlags.command.rawValue | NSEvent.ModifierFlags.shift.rawValue,
+            // simulate click on Status Bar item to open menu
+            task: { _ in self.statusItem.button?.performClick(nil) })
+        
+        // register global hotkey detection
+        DDHotKeyCenter.shared()?.register(globalHotKey)
+        
         // start listening for pasteboard changes
         pasteboardWatcher.delegate = self
         pasteboardWatcher.startPolling()
-        
-        // register hotkey detection
-        DDHotKeyCenter.shared()?.registerHotKey(
-            withKeyCode: UInt16(0x2A), // 0x09
-            modifierFlags: NSEvent.ModifierFlags.command.rawValue | NSEvent.ModifierFlags.shift.rawValue,
-            task: { (event : NSEvent?) in
-                if let e = event {
-                    self.globalHotKeyHandler(event: e)
-                }
-        });
     }
     
-    @objc func globalHotKeyHandler(event : NSEvent){
-        statusItem.button?.performClick(nil)
-        //        if let statusBtn = statusItem.button {
-        //            popover.show(relativeTo: statusBtn.bounds, of: statusBtn, preferredEdge: NSRectEdge.minY)
-        //        }
-        print(event)
+    func menuWillOpen(_ menu: NSMenu) {
+        // temporarily unregister global hotkey detection to prevent the menu from opening multiple times
+        DDHotKeyCenter.shared()?.unregisterHotKey(globalHotKey)
+    }
+    
+    func menuDidClose(_ menu: NSMenu) {
+        // re-enable hotkey detection after menu is closed
+        DDHotKeyCenter.shared()?.register(globalHotKey)
+    }
+    
+    @objc func menuItemClicked(sender: NSMenuItem) {
+        if let value = sender.representedObject as? String {
+            // skip the next pasteboard change detection so the selected value will not be readded to the ring
+            skipNextCopiedString = true
+            
+            // set current pasteboard string value
+            let pasteboard = NSPasteboard.general
+            pasteboard.declareTypes([NSPasteboard.PasteboardType.string], owner: nil)
+            pasteboard.setString(value, forType: NSPasteboard.PasteboardType.string)
+        }
     }
     
     @IBAction func quitClicked(_ sender: NSMenuItem) {
+        DDHotKeyCenter.shared()?.unregisterHotKey(globalHotKey)
         NSApplication.shared.terminate(self)
     }
     
@@ -70,22 +90,31 @@ class StatusMenuController: NSObject, PasteboardWatcherDelegate {
         let items = statusMenu.items;
         let clipCount = items.count - 4;
         
-        // check if first clip is equal to new value and immediately return without adding a new menu item
         if clipCount > 0 {
+            // if the new value is equal to the first item then do not add a new menu item
             if let firstValue = items.first?.representedObject as? String {
                 if newValue == firstValue {
                     return
                 }
             }
+            
+            // update the shortcut key numbers for the first 9 menu items to the next number
+            for i in 0...min(8, clipCount-1) {
+                items[i].keyEquivalent = String(i+1)
+            }
+            
+            // if a 10th menu item exists then remove it's shortcut key because
+            // this menu item is going to be pushed down to 11th position after the new item is added to the menu
+            if clipCount >= 10 {
+                items[9].keyEquivalent = ""
+            }
         }
         
-        // if no elements or new value different from first value then create new menu item
-        
-        // create truncated label of the value
+        // create truncated label of the new value
         let trimmedValue = newValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         let label = trimmedValue.count > 40 ? String(trimmedValue.prefix(40)) + "..." : trimmedValue;
         
-        // create menu item with shortcut Command + 0
+        // create a new menu item with shortcut "0"
         let menuItem = NSMenuItem(title: label, action: #selector(menuItemClicked(sender:)), keyEquivalent: "0")
         menuItem.keyEquivalentModifierMask = []
         menuItem.representedObject = newValue
@@ -93,36 +122,12 @@ class StatusMenuController: NSObject, PasteboardWatcherDelegate {
         menuItem.isEnabled = true
         menuItem.toolTip = newValue;
         
-        // update shortcut numbers for the 9 existing top menu items
-        if clipCount > 0 {
-            for i in 0...min(8, clipCount-1) {
-                items[i].keyEquivalent = String(i+1)
-            }
-        }
-        
-        // remove shortcut from existing 10th menu item
-        if clipCount >= 10 {
-            items[9].keyEquivalent = ""
-        }
+        // insert new menu item at the top of the items
+        statusMenu.insertItem(menuItem, at: 0)
         
         // unhide clear menu item and separator
         clearMenuItem.isHidden = false
         clearSeparatorItem.isHidden = false
-        
-        // insert new menu item at the top of the items
-        statusMenu.insertItem(menuItem, at: 0)
-    }
-    
-    @objc func menuItemClicked(sender: NSMenuItem) {
-        if let value = sender.representedObject as? String {
-            // skip the next pasteboard change detection so the selected value will not be readded to the ring
-            skipNextCopiedString = true
-            
-            // set current pasteboard string value
-            let pasteboard = NSPasteboard.general
-            pasteboard.declareTypes([NSPasteboard.PasteboardType.string], owner: nil)
-            pasteboard.setString(value, forType: NSPasteboard.PasteboardType.string)
-        }
     }
     
     func newlyCopiedStringObtained(copiedString: String) {
