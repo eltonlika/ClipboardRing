@@ -23,8 +23,7 @@
         <menu id="Mab-9a-h2r">
             <items>
                 <menuItem isSeparatorItem="YES" id="ZoU-bN-RqN"/>
-                <menuItem title="Clear" id="ynd-pz-WSB">
-                    <modifierMask key="keyEquivalentModifierMask"/>
+                <menuItem title="Clear" keyEquivalent="c" id="ynd-pz-WSB">
                     <connections>
                         <action selector="clearClicked:" target="BWd-bQ-Sva" id="xby-DE-jn3"/>
                     </connections>
