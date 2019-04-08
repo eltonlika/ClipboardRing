@@ -86,6 +86,16 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
             let pasteboard = NSPasteboard.general
             pasteboard.declareTypes([NSPasteboard.PasteboardType.string], owner: nil)
             pasteboard.setString(value, forType: NSPasteboard.PasteboardType.string)
+            
+            // update ticked status of existing menu items to OFF
+            let items = statusMenu.items
+            let clipCount = items.count - 4
+            for i in 0..<clipCount {
+                items[i].state = .off
+            }
+            
+            // update ticked status of selected menu item to ON
+            sender.state = .on
         }
     }
     
@@ -105,20 +115,27 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         let clipCount = items.count - 4
         
         if clipCount > 0 {
+            // update ticked status of existing menu items to OFF
+            for i in 0..<clipCount {
+                items[i].state = .off
+            }
+            
             // if the new value is equal to the first item then do not add a new menu item
-            if let firstValue = items.first?.representedObject as? String {
+            if let firstClipItem = items.first,
+                let firstValue = firstClipItem.representedObject as? String {
                 if newValue == firstValue {
+                    firstClipItem.state = .on
                     return
                 }
             }
             
             // update the shortcut key numbers for the first 9 menu items to the next number
-            for i in 0...min(8, clipCount-1) {
+            for i in 0..<min(9, clipCount) {
                 items[i].keyEquivalent = String(i+1)
             }
             
-            // if a 10th menu item exists then remove it's shortcut key because
-            // this menu item is going to be pushed down to 11th position after the new item is added to the menu
+            // if a 10th menu item exists then remove it's shortcut key because this menu item
+            // is going to be pushed down to 11th position after the new item is added to the menu
             if clipCount >= 10 {
                 items[9].keyEquivalent = ""
             }
@@ -129,12 +146,16 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         let label = trimmedValue.count > 40 ? String(trimmedValue.prefix(40)) + "..." : trimmedValue
         
         // create a new menu item with shortcut "0"
-        let menuItem = NSMenuItem(title: label, action: #selector(menuItemClicked(sender:)), keyEquivalent: "0")
+        let menuItem = NSMenuItem(title: label,
+                                  action: #selector(menuItemClicked(sender:)),
+                                  keyEquivalent: "0")
         menuItem.keyEquivalentModifierMask = []
         menuItem.representedObject = newValue
         menuItem.target = self
         menuItem.isEnabled = true
         menuItem.toolTip = newValue
+        // update ticked status of new menu item to ON
+        menuItem.state = .on
         
         // insert new menu item at the top of the items
         statusMenu.insertItem(menuItem, at: 0)
