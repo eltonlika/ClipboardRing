@@ -15,37 +15,46 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     @IBOutlet weak var pasteOnSelectionMenuItem: NSMenuItem!
     @IBOutlet weak var startAtLoginMenuItem: NSMenuItem!
     @IBOutlet weak var quitMenuItem: NSMenuItem!
+    @IBOutlet weak var pasteboardWatcher: PasteboardWatcher!
     
-    private let numOfStaticMenuItems = 5
-    private var clipMenuItems : [NSMenuItem] { get { return statusMenu.items.dropLast(numOfStaticMenuItems) } }
+    private let statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     
-    private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-    
-    private let pasteboardWatcher = PasteboardWatcher()
+    private var clipMenuItems : [NSMenuItem] { get { return statusMenu.items.dropLast(5) } }
     
     private var globalHotKey : DDHotKey?
+    
+    private var autopasteEnabled : Bool {
+        get { return UserDefaults.standard.bool(forKey: "autopaste") }
+        set(selected) { UserDefaults.standard.set(selected, forKey: "autopaste") }
+    }
     
     // flag that when set to true skips the next pasteboard copy detection
     private var skipNextCopiedString = false
     
+    private func isAccessibilityTrusted(prompt : Bool) -> Bool {
+        let options : NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as NSString: prompt]
+        return AXIsProcessTrustedWithOptions(options)
+    }
+    
     override func awakeFromNib() {
-        // set status item appearance
-        let icon = NSImage(named: "statusIcon")
-        icon?.isTemplate = true // best for dark mode
-        statusItem.button?.image = icon
-        statusItem.menu = statusMenu
-        statusItem.isVisible = true
-        
-        // set menu delegate
-        statusMenu.delegate = self
-        
         // initially there are no clipboard items, so hide the Clear button
         clearMenuItem.isHidden = true
         
-        // set state and handler of "Start at login" menu item
-        startAtLoginMenuItem.action = #selector(toggleStartAtLogin)
-        startAtLoginMenuItem.target = self
+        // set state of "Paste on selection" menu item
+        pasteOnSelectionMenuItem.state = (autopasteEnabled && isAccessibilityTrusted(prompt: false)) ? .on : .off
+        
+        // set state of "Start at login" menu item
         startAtLoginMenuItem.state = PALoginItemUtility.isCurrentApplicatonInLoginItems() ? .on : .off
+        
+        // set status item appearance
+        let icon = NSImage(named: "statusIcon")
+        icon?.isTemplate = true // best for dark mode
+        statusBarItem.button?.image = icon
+        statusBarItem.menu = statusMenu
+        statusBarItem.isVisible = true
+        
+        // set menu delegate
+        statusMenu.delegate = self
         
         // set default hotkey handler
         globalHotKey = DDHotKey(
@@ -56,9 +65,38 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         // register global hotkey detection
         DDHotKeyCenter.shared()?.register(globalHotKey)
         
-        // start listening for pasteboard changes
+        // set pasteboard watcher delegate
         pasteboardWatcher.delegate = self
-        pasteboardWatcher.startPolling()
+    }
+    
+    @IBAction func clearClicked(_ sender: NSMenuItem) {
+        NSPasteboard.general.clearContents()
+        statusMenu.items.removeFirst(statusMenu.items.count - 5)
+        clearMenuItem.isHidden = true
+    }
+    
+    @IBAction func pasteOnSelectionClicked(_ sender: NSMenuItem) {
+        if sender.state == .on {
+            autopasteEnabled = false
+        } else {
+            autopasteEnabled = isAccessibilityTrusted(prompt: true)
+        }
+        sender.state = autopasteEnabled ? .on : .off
+    }
+    
+    @IBAction func startAtLoginClicked(_ sender: NSMenuItem) {
+        if PALoginItemUtility.isCurrentApplicatonInLoginItems() {
+            PALoginItemUtility.removeCurrentApplicatonToLoginItems()
+            startAtLoginMenuItem.state = .off
+        } else {
+            PALoginItemUtility.addCurrentApplicatonToLoginItems()
+            startAtLoginMenuItem.state = .on
+        }
+    }
+    
+    @IBAction func quitClicked(_ sender: NSMenuItem) {
+        DDHotKeyCenter.shared()?.unregisterHotKey(globalHotKey)
+        NSApplication.shared.terminate(self)
     }
     
     func menuWillOpen(_ menu: NSMenu) {
@@ -69,31 +107,26 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     func menuDidClose(_ menu: NSMenu) {
         // re-enable hotkey detection after menu is closed
         DDHotKeyCenter.shared()?.register(globalHotKey)
-        
-        // show static menu items hidden when menu opened from global hotkey
-        pasteOnSelectionMenuItem.isHidden = false
-        startAtLoginMenuItem.isHidden = false
-        quitMenuItem.isHidden = false
     }
     
     @objc func globalHotkeyHandler(){
-        // hide static menu items when menu opened from global hotkey
+        // do not show if no items
+        if clipMenuItems.isEmpty {
+            return
+        }
+        
+        // temporarily hide static menu items when menu opened from global hotkey
         pasteOnSelectionMenuItem.isHidden = true
         startAtLoginMenuItem.isHidden = true
         quitMenuItem.isHidden = true
         
-        // open menu where the mouse pointer is
+        // open menu where the mouse pointer is (this function call blocks until the menu is closed)
         statusMenu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
-    }
-    
-    @objc func toggleStartAtLogin() {
-        if PALoginItemUtility.isCurrentApplicatonInLoginItems() {
-            PALoginItemUtility.removeCurrentApplicatonToLoginItems()
-            startAtLoginMenuItem.state = .off
-        }else{
-            PALoginItemUtility.addCurrentApplicatonToLoginItems()
-            startAtLoginMenuItem.state = .on
-        }
+        
+        // unhide static menu items that were hidden when menu opened from global hotkey
+        pasteOnSelectionMenuItem.isHidden = false
+        startAtLoginMenuItem.isHidden = false
+        quitMenuItem.isHidden = false
     }
     
     @objc func menuItemClicked(sender: NSMenuItem) {
@@ -111,18 +144,11 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
             
             // update ticked status of selected menu item to ON
             sender.state = .on
+            
+            if autopasteEnabled {
+                paste()
+            }
         }
-    }
-    
-    @IBAction func quitClicked(_ sender: NSMenuItem) {
-        DDHotKeyCenter.shared()?.unregisterHotKey(globalHotKey)
-        NSApplication.shared.terminate(self)
-    }
-    
-    @IBAction func clearClicked(_ sender: NSMenuItem) {
-        NSPasteboard.general.clearContents()
-        statusMenu.items.removeFirst(statusMenu.items.count - numOfStaticMenuItems)
-        clearMenuItem.isHidden = true
     }
     
     private func addNewClipMenuItem(newValue: String) {
@@ -186,6 +212,15 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         if !copiedString.isEmpty {
             addNewClipMenuItem(newValue: copiedString)
         }
+    }
+    
+    private func paste() {
+        let event1 = CGEvent(keyboardEventSource: nil, virtualKey: 0x09, keyDown: true); // cmd-v down
+        event1?.flags = CGEventFlags.maskCommand;
+        event1?.post(tap: CGEventTapLocation.cghidEventTap);
+        let event2 = CGEvent(keyboardEventSource: nil, virtualKey: 0x09, keyDown: false) // cmd-v up
+        //event2?.flags = CGEventFlags.maskCommand
+        event2?.post(tap: CGEventTapLocation.cghidEventTap)
     }
     
 }

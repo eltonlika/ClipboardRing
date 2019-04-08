@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
     </dependencies>
     <objects>
@@ -11,17 +12,23 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="ClipboardRing" customModuleProvider="target"/>
+        <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="ClipboardRing" customModuleProvider="target">
+            <connections>
+                <outlet property="pasteboardWatcher" destination="2bk-jC-Xs0" id="Kkz-MP-4VB"/>
+            </connections>
+        </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <customObject id="BWd-bQ-Sva" customClass="StatusMenuController" customModule="ClipboardRing" customModuleProvider="target">
             <connections>
                 <outlet property="clearMenuItem" destination="ynd-pz-WSB" id="BtR-t3-186"/>
                 <outlet property="pasteOnSelectionMenuItem" destination="Dam-gH-PFf" id="Fx8-ir-Dvo"/>
+                <outlet property="pasteboardWatcher" destination="2bk-jC-Xs0" id="fUM-qE-t2X"/>
                 <outlet property="quitMenuItem" destination="wJe-Nb-i6u" id="99c-z4-YF6"/>
                 <outlet property="startAtLoginMenuItem" destination="j1A-3b-n4E" id="tv8-ex-kKy"/>
                 <outlet property="statusMenu" destination="Mab-9a-h2r" id="1FQ-M6-2Hw"/>
             </connections>
         </customObject>
+        <customObject id="2bk-jC-Xs0" customClass="PasteboardWatcher" customModule="ClipboardRing" customModuleProvider="target"/>
         <menu id="Mab-9a-h2r">
             <items>
                 <menuItem isSeparatorItem="YES" id="ZoU-bN-RqN"/>
@@ -32,9 +39,15 @@
                 </menuItem>
                 <menuItem title="Paste on selection" id="Dam-gH-PFf">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="pasteOnSelectionClicked:" target="BWd-bQ-Sva" id="Kph-Ss-2jW"/>
+                    </connections>
                 </menuItem>
                 <menuItem title="Start at login" id="j1A-3b-n4E">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="startAtLoginClicked" target="BWd-bQ-Sva" id="YZc-l5-m6b"/>
+                    </connections>
                 </menuItem>
                 <menuItem title="Quit" keyEquivalent="q" id="wJe-Nb-i6u">
                     <connections>

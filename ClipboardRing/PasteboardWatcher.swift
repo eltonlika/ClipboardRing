@@ -31,6 +31,11 @@ class PasteboardWatcher : NSObject {
         }
     }
     
+    public func stopPolling(){
+        timer?.invalidate()
+        timer = nil
+    }
+    
     private func timerFired(t : Timer){
         // assigning current pasteboard changeCount so that it can be compared later to identify changes
         let newChangeCount = pasteboard.changeCount
