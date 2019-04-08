@@ -16,6 +16,8 @@
         <customObject id="BWd-bQ-Sva" customClass="StatusMenuController" customModule="ClipboardRing" customModuleProvider="target">
             <connections>
                 <outlet property="clearMenuItem" destination="ynd-pz-WSB" id="BtR-t3-186"/>
+                <outlet property="pasteOnSelectionMenuItem" destination="Dam-gH-PFf" id="Fx8-ir-Dvo"/>
+                <outlet property="quitMenuItem" destination="wJe-Nb-i6u" id="99c-z4-YF6"/>
                 <outlet property="startAtLoginMenuItem" destination="j1A-3b-n4E" id="tv8-ex-kKy"/>
                 <outlet property="statusMenu" destination="Mab-9a-h2r" id="1FQ-M6-2Hw"/>
             </connections>
@@ -27,6 +29,9 @@
                     <connections>
                         <action selector="clearClicked:" target="BWd-bQ-Sva" id="xby-DE-jn3"/>
                     </connections>
+                </menuItem>
+                <menuItem title="Paste on selection" id="Dam-gH-PFf">
+                    <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
                 <menuItem title="Start at login" id="j1A-3b-n4E">
                     <modifierMask key="keyEquivalentModifierMask"/>

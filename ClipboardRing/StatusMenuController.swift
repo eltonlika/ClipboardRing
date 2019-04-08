@@ -12,7 +12,12 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     
     @IBOutlet weak var statusMenu: NSMenu!
     @IBOutlet weak var clearMenuItem: NSMenuItem!
+    @IBOutlet weak var pasteOnSelectionMenuItem: NSMenuItem!
     @IBOutlet weak var startAtLoginMenuItem: NSMenuItem!
+    @IBOutlet weak var quitMenuItem: NSMenuItem!
+    
+    private let numOfStaticMenuItems = 5
+    private var clipMenuItems : [NSMenuItem] { get { return statusMenu.items.dropLast(numOfStaticMenuItems) } }
     
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     
@@ -46,8 +51,7 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         globalHotKey = DDHotKey(
             keyCode: UInt16(0x09),
             modifierFlags: NSEvent.ModifierFlags.control.rawValue | NSEvent.ModifierFlags.shift.rawValue,
-            // simulate click on Status Bar item to open menu
-            task: { _ in self.statusMenu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil) })
+            task: { _ in self.globalHotkeyHandler() })
         
         // register global hotkey detection
         DDHotKeyCenter.shared()?.register(globalHotKey)
@@ -65,6 +69,23 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     func menuDidClose(_ menu: NSMenu) {
         // re-enable hotkey detection after menu is closed
         DDHotKeyCenter.shared()?.register(globalHotKey)
+        
+        // show static menu items hidden when menu opened from global hotkey
+        clearMenuItem.isHidden = false
+        pasteOnSelectionMenuItem.isHidden = false
+        startAtLoginMenuItem.isHidden = false
+        quitMenuItem.isHidden = false
+    }
+    
+    @objc func globalHotkeyHandler(){
+        // hide static menu items when menu opened from global hotkey
+        clearMenuItem.isHidden = true
+        pasteOnSelectionMenuItem.isHidden = true
+        startAtLoginMenuItem.isHidden = true
+        quitMenuItem.isHidden = true
+        
+        // open menu where the mouse pointer is
+        statusMenu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
     }
     
     @objc func toggleStartAtLogin() {
@@ -88,11 +109,7 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
             pasteboard.setString(value, forType: NSPasteboard.PasteboardType.string)
             
             // update ticked status of existing menu items to OFF
-            let items = statusMenu.items
-            let clipCount = items.count - 4
-            for i in 0..<clipCount {
-                items[i].state = .off
-            }
+            clipMenuItems.forEach {item in item.state = .off}
             
             // update ticked status of selected menu item to ON
             sender.state = .on
@@ -106,22 +123,20 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     
     @IBAction func clearClicked(_ sender: NSMenuItem) {
         NSPasteboard.general.clearContents()
-        statusMenu.items.removeFirst(statusMenu.items.count - 4)
+        statusMenu.items.removeFirst(statusMenu.items.count - numOfStaticMenuItems)
         clearMenuItem.isHidden = true
     }
     
     private func addNewClipMenuItem(newValue: String) {
-        let items = statusMenu.items
-        let clipCount = items.count - 4
+        let clipItems = clipMenuItems
+        let clipCount = clipItems.count
         
         if clipCount > 0 {
             // update ticked status of existing menu items to OFF
-            for i in 0..<clipCount {
-                items[i].state = .off
-            }
+            clipItems.forEach {item in item.state = .off}
             
             // if the new value is equal to the first item then do not add a new menu item
-            if let firstClipItem = items.first,
+            if let firstClipItem = clipItems.first,
                 let firstValue = firstClipItem.representedObject as? String {
                 if newValue == firstValue {
                     firstClipItem.state = .on
@@ -131,13 +146,13 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
             
             // update the shortcut key numbers for the first 9 menu items to the next number
             for i in 0..<min(9, clipCount) {
-                items[i].keyEquivalent = String(i+1)
+                clipItems[i].keyEquivalent = String(i+1)
             }
             
             // if a 10th menu item exists then remove it's shortcut key because this menu item
             // is going to be pushed down to 11th position after the new item is added to the menu
             if clipCount >= 10 {
-                items[9].keyEquivalent = ""
+                clipItems[9].keyEquivalent = ""
             }
         }
         
