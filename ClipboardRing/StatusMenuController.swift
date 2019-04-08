@@ -44,10 +44,10 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         
         // set default hotkey handler
         globalHotKey = DDHotKey(
-            keyCode: UInt16(0x2A),
-            modifierFlags: NSEvent.ModifierFlags.command.rawValue | NSEvent.ModifierFlags.shift.rawValue,
+            keyCode: UInt16(0x09),
+            modifierFlags: NSEvent.ModifierFlags.control.rawValue | NSEvent.ModifierFlags.shift.rawValue,
             // simulate click on Status Bar item to open menu
-            task: { _ in self.statusItem.button?.performClick(nil) })
+            task: { _ in self.statusMenu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil) })
         
         // register global hotkey detection
         DDHotKeyCenter.shared()?.register(globalHotKey)
