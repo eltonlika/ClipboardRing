@@ -71,7 +71,6 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         DDHotKeyCenter.shared()?.register(globalHotKey)
         
         // show static menu items hidden when menu opened from global hotkey
-        clearMenuItem.isHidden = false
         pasteOnSelectionMenuItem.isHidden = false
         startAtLoginMenuItem.isHidden = false
         quitMenuItem.isHidden = false
@@ -79,7 +78,6 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     
     @objc func globalHotkeyHandler(){
         // hide static menu items when menu opened from global hotkey
-        clearMenuItem.isHidden = true
         pasteOnSelectionMenuItem.isHidden = true
         startAtLoginMenuItem.isHidden = true
         quitMenuItem.isHidden = true
