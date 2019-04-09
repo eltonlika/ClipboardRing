@@ -31,6 +31,9 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     // flag that when set to true skips the next pasteboard copy detection
     private var skipNextCopiedString = false
     
+    // flag set to true if menu was opened from global hotkey shortcut
+    private var menuOpenedFromGlobalHotkey = false
+    
     private func isAccessibilityTrusted(prompt : Bool) -> Bool {
         let options : NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as NSString: prompt]
         return AXIsProcessTrustedWithOptions(options)
@@ -105,6 +108,8 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     }
     
     func menuDidClose(_ menu: NSMenu) {
+        menuOpenedFromGlobalHotkey = false
+        
         // re-enable hotkey detection after menu is closed
         DDHotKeyCenter.shared()?.register(globalHotKey)
     }
@@ -119,6 +124,8 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         pasteOnSelectionMenuItem.isHidden = true
         startAtLoginMenuItem.isHidden = true
         quitMenuItem.isHidden = true
+        
+        menuOpenedFromGlobalHotkey = true;
         
         // open menu where the mouse pointer is (this function call blocks until the menu is closed)
         statusMenu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
@@ -145,7 +152,8 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
             // update ticked status of selected menu item to ON
             sender.state = .on
             
-            if autopasteEnabled {
+            // paste automatically only if menu opened from global hotkey
+            if menuOpenedFromGlobalHotkey && autopasteEnabled {
                 paste()
             }
         }
