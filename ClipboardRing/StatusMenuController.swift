@@ -108,8 +108,6 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     }
     
     func menuDidClose(_ menu: NSMenu) {
-        menuOpenedFromGlobalHotkey = false
-        
         // re-enable hotkey detection after menu is closed
         DDHotKeyCenter.shared()?.register(globalHotKey)
     }
@@ -125,10 +123,12 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         startAtLoginMenuItem.isHidden = true
         quitMenuItem.isHidden = true
         
-        menuOpenedFromGlobalHotkey = true;
+        menuOpenedFromGlobalHotkey = true
         
         // open menu where the mouse pointer is (this function call blocks until the menu is closed)
         statusMenu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
+        
+        menuOpenedFromGlobalHotkey = false
         
         // unhide static menu items that were hidden when menu opened from global hotkey
         pasteOnSelectionMenuItem.isHidden = false
