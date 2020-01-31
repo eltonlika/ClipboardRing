@@ -6,8 +6,6 @@
 //  Copyright © 2019 Elton Lika. All rights reserved.
 //
 
-import Cocoa
-
 class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate {
     
     @IBOutlet weak var statusMenu: NSMenu!
@@ -47,7 +45,7 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         pasteOnSelectionMenuItem.state = (autopasteEnabled && isAccessibilityTrusted(prompt: false)) ? .on : .off
         
         // set state of "Start at login" menu item
-        startAtLoginMenuItem.state = PALoginItemUtility.isCurrentApplicatonInLoginItems() ? .on : .off
+        startAtLoginMenuItem.state = LoginItems.isLoginItem() ? .on : .off
         
         // set status item appearance
         let icon = NSImage(named: "statusIcon")
@@ -88,11 +86,11 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
     }
     
     @IBAction func startAtLoginClicked(_ sender: NSMenuItem) {
-        if PALoginItemUtility.isCurrentApplicatonInLoginItems() {
-            PALoginItemUtility.removeCurrentApplicatonToLoginItems()
+        if LoginItems.isLoginItem(){
+            LoginItems.removeLoginItem()
             startAtLoginMenuItem.state = .off
         } else {
-            PALoginItemUtility.addCurrentApplicatonToLoginItems()
+            LoginItems.addLoginItem()
             startAtLoginMenuItem.state = .on
         }
     }
@@ -222,10 +220,12 @@ class StatusMenuController: NSObject, NSMenuDelegate, PasteboardWatcherDelegate 
         }
     }
     
+    // simulate paste event
     private func paste() {
         let event1 = CGEvent(keyboardEventSource: nil, virtualKey: 0x09, keyDown: true); // cmd-v down
         event1?.flags = CGEventFlags.maskCommand;
         event1?.post(tap: CGEventTapLocation.cghidEventTap);
+        
         let event2 = CGEvent(keyboardEventSource: nil, virtualKey: 0x09, keyDown: false) // cmd-v up
         //event2?.flags = CGEventFlags.maskCommand
         event2?.post(tap: CGEventTapLocation.cghidEventTap)

@@ -6,8 +6,6 @@
 //  Copyright © 2019 Elton Lika. All rights reserved.
 //
 
-import Cocoa
-
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     

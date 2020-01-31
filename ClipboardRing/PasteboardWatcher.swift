@@ -6,8 +6,6 @@
 //  Copyright © 2019 Elton Lika. All rights reserved.
 //
 
-import Cocoa
-
 /// Protocol defining the methods which delegate should implement
 protocol PasteboardWatcherDelegate {
     /// the method which is invoked on delegate when a new string is copied
@@ -36,7 +34,7 @@ class PasteboardWatcher : NSObject {
         timer = nil
     }
     
-    private func timerFired(t : Timer){
+    private func timerFired(t: Timer){
         // assigning current pasteboard changeCount so that it can be compared later to identify changes
         let newChangeCount = pasteboard.changeCount
         
